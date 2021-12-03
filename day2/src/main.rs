@@ -47,7 +47,7 @@ impl Sub {
         Sub { horiz: 0, depth: 0 }
     }
 
-    fn execute_move(&mut self, m: Move) {
+    fn execute_move(&mut self, m: &Move) {
         match m {
             Move::Forward(amount) => {
                 self.horiz += amount; 
@@ -58,6 +58,34 @@ impl Sub {
             Move::Up(amount) => {
                 self.depth -= amount;
             }
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+struct AimingSub {
+    horiz: i32,
+    depth: i32,
+    aim: i32,
+}
+
+impl AimingSub {
+    fn new() -> Self {
+        AimingSub { horiz: 0, depth: 0, aim: 0 }
+    }
+
+    fn execute_move(&mut self, m: &Move) {
+        match m {
+            Move::Forward(amount) => {
+                self.horiz += amount;
+                self.depth += self.aim * amount;
+            },
+            Move::Down(amount) => {
+                self.aim += amount;
+            },
+            Move::Up(amount) => {
+                self.aim -= amount;
+            },
         }
     }
 }
@@ -79,12 +107,19 @@ fn main() -> Result<(), Error> {
     }).collect();
 
     let mut sub = Sub::new();
-    for m in inputs {
-        println!("Move: {:?}", m);
+    for m in &inputs[..] {
         sub.execute_move(m);
     }
     println!("Sub is at position: {}, {}", sub.horiz, sub.depth);
     println!("Position * Depth: {}", sub.horiz * sub.depth);
+
+    let mut aiming_sub = AimingSub::new();
+    for m in &inputs[..] {
+        aiming_sub.execute_move(m);
+    }
+
+    println!("AimingSub is at position: {}, {}", aiming_sub.horiz, aiming_sub.depth);
+    println!("Position * Depth: {}", aiming_sub.horiz * aiming_sub.depth);
 
     Ok(())
 }
